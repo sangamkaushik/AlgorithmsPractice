@@ -63,3 +63,100 @@ def subsets arr
 
   prev_subsets + new_sets
 end
+
+# Permutations
+def permutations str
+  return [str] if str.length == 1
+  first_char = str[0]
+  prev_perms = permutations(str[1..-1])
+  resultant = []
+  prev_perms.each do |perm|
+    (0..perm.length).each do |idx|
+      resultant << perm.dup.insert(idx,first_char)
+    end
+  end
+  resultant
+end
+
+# Arithmetic Permutations
+# [1,2] => 2+1, 2-1, 2*1, 2/1, 1-2, 1/2
+
+# [1,2,3] =>  2+1+3, 2-1+3, 2*1+3, 2/1+3,
+#             2+1-3, 2-1-3, 2*1-3, 2/1-3,
+#             2+1*3, 2-1*3, 2*1*3, 2/1*3,
+#             2+1/3, 2-1/3, 2*1/3, 2/1/3
+
+# nums is an array of numbers in string format
+def arithmetic_permutations nums
+  return nums if nums.length <= 1
+  last_char = nums[-1]
+  prev_perms = arithmetic_permutations(nums[0...-1])
+  resultant = []
+  prev_perms.each do |perm|
+    resultant << (perm + ' + ' + last_char)
+    resultant << (perm + ' - ' + last_char)
+    resultant << (perm + ' * ' + last_char)
+    resultant << (perm + ' / ' + last_char)
+  end
+  resultant
+end
+
+# def arithmetic_permutations num
+#   return [""] if num <= 1
+#   return ['+', '-', '*', '/'] if num == 2
+#   prev_perms = arithmetic_permutations(num-1)
+#   resultant = []
+#   prev_perms.each do |perm|
+#     resultant << (perm + '+')
+#     resultant << (perm + '-')
+#     resultant << (perm + '*')
+#     resultant << (perm + '/')
+#   end
+#   resultant
+# end
+
+#num_subsets finds all subsets of the number and returns an array of them.
+#num is in string format.
+#It essentially inserts spaces at different spots of the string to find all possible subsets.
+def num_subsets num
+  return [num] if num.length <= 1
+  last_char = num[-1]
+  prev_subsets = num_subsets(num[0...-1])
+  resultant = []
+
+  prev_subsets.each do |subset|
+    resultant << subset + last_char
+    resultant << subset + " " + last_char
+  end
+  resultant
+end
+
+def triple_byte num,target
+  subsets = num_subsets(num.to_s) #Covert the number to string, then send it to num_subsets to get all possible subsets.
+  nums_array = subsets.map{|x| x.split(" ")}  #Turn it into better format. Take the spaces out to form numbers.
+  matches = []
+  nums_array.map! do |nums|
+    permutations = arithmetic_permutations(nums) #Insert arithmetic operators at each space to find all permutations possible.
+    permutations.each do |expression|
+      puts expression + " = #{target}" if eval(expression) == target
+    end
+  end
+end
+
+
+# subsets
+# [] => [[]]
+# [1] => [[],[1]]
+# [1,2] => [[],[1], [2], [1,2]]
+# def num_subsets nums
+#   return [nums] if nums.length <= 1
+#   last_el = nums[-1]
+#   prev_subsets = num_subsets(nums[0...-1])
+#   resultant = []
+#   new_sets = prev_subsets.map do |subset|
+#     resultant << subset
+#     resultant << subset + [last_el]
+#   end
+#
+#   return resultant
+# end
