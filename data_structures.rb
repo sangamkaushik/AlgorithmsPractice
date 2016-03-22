@@ -69,8 +69,50 @@ class ListNodeDouble
 end
 # # Hash Map
 #
-# # LRU Cache
-#
+# # LRU Cache - Doesn't work, Need to implement a doubly linked list
+class LRUCache
+  def initialize prc, capacity=10
+    @capacity = capacity
+    @prc = prc
+    @map = {}
+    @store = LinkedList.new
+  end
+
+  def get key
+    if @map[key]
+      link = @map[key]
+      update_link!(link)
+      link.val
+    else
+      fetch_from_database(key)
+    end
+  end
+
+  private
+
+  def update_link! link
+    link.prev.next = link.next
+    link.next.prev = link.prev
+
+    link.next = @store.head
+    @store.head = link
+    link.next.prev = link
+  end
+
+  def fetch_from_database link
+    val = @prc.call(key)
+    link = @store.insert_at_head(key, val)
+    @map[key] = link
+
+    eject! if @map.count > @capacity
+    val
+  end
+
+  def eject!
+    @map.delete(@tail.prev.next)
+    @tail.prev.next = nil
+  end
+end
 # # Heap
 #
 # # Graph
